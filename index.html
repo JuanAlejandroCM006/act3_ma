@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actividad 3 - Componente Botón</title>
+    <style>
+      :root {
+        --bg: #0f172a;
+        --card: #111827;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --primary: #3b82f6;
+        --danger: #ef4444;
+        --ok: #22c55e;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+        background: linear-gradient(160deg, #0b1024, var(--bg));
+        color: var(--text);
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        padding: 20px;
+      }
+
+      .app {
+        width: min(980px, 100%);
+        background: rgba(17, 24, 39, .9);
+        border: 1px solid #334155;
+        border-radius: 16px;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 300px 1fr;
+      }
+
+      .panel {
+        padding: 18px;
+        border-right: 1px solid #334155;
+      }
+
+      .stage {
+        padding: 24px;
+        display: grid;
+        gap: 16px;
+      }
+
+      h1 { font-size: 1.05rem; margin: 0 0 6px; }
+      p { color: var(--muted); margin: 0 0 16px; font-size: .92rem; }
+
+      label { display: block; margin: 12px 0 6px; font-size: .85rem; color: #cbd5e1; }
+      input, select {
+        width: 100%;
+        background: #0b1220;
+        color: var(--text);
+        border: 1px solid #334155;
+        border-radius: 10px;
+        padding: 10px;
+      }
+
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+      .buttons { display: grid; gap: 8px; margin-top: 14px; }
+      button {
+        border: 1px solid #334155;
+        background: #1f2937;
+        color: #e5e7eb;
+        border-radius: 10px;
+        padding: 10px;
+        cursor: pointer;
+      }
+      button:hover { background: #334155; }
+
+      .preview {
+        border: 1px dashed #475569;
+        border-radius: 14px;
+        min-height: 320px;
+        display: grid;
+        place-items: center;
+        background: rgba(15, 23, 42, .4);
+      }
+
+      .component-btn {
+        border: none;
+        background: var(--primary);
+        color: white;
+        font-weight: 600;
+        transition: transform .1s ease, opacity .2s ease;
+      }
+      .component-btn:active { transform: scale(.98); }
+      .component-btn.disabled { background: #64748b; opacity: .7; cursor: not-allowed; }
+      .component-btn.hidden { display: none; }
+
+      .shape-ellipse { border-radius: 999px; }
+      .shape-rect { border-radius: 8px; }
+      .shape-hex {
+        clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        border-radius: 0;
+      }
+
+      .log {
+        background: #020617;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 10px;
+        min-height: 110px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        font-size: .82rem;
+        color: #bfdbfe;
+        overflow: auto;
+        white-space: pre-wrap;
+      }
+
+      .status-ok { color: var(--ok); }
+      .status-bad { color: var(--danger); }
+
+      @media (max-width: 880px) {
+        .app { grid-template-columns: 1fr; }
+        .panel { border-right: 0; border-bottom: 1px solid #334155; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <section class="panel">
+        <h1>Componente Botón de Comando</h1>
+        <p>Actividad No. 3 implementada como página web (HTML + CSS + JavaScript).</p>
+
+        <label for="text">Texto</label>
+        <input id="text" value="Enviar" />
+
+        <label for="shape">Forma</label>
+        <select id="shape">
+          <option value="ellipse">Elipse</option>
+          <option value="rect" selected>Rectángulo</option>
+          <option value="hex">Hexágono</option>
+        </select>
+
+        <div class="row">
+          <div>
+            <label for="width">Ancho</label>
+            <input id="width" type="number" min="40" value="160" />
+          </div>
+          <div>
+            <label for="height">Alto</label>
+            <input id="height" type="number" min="30" value="50" />
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button id="applyBtn">Aplicar propiedades</button>
+          <button id="toggleEnabled">Habilitar / Deshabilitar</button>
+          <button id="toggleVisible">Mostrar / Ocultar</button>
+        </div>
+      </section>
+
+      <section class="stage">
+        <div class="preview">
+          <button id="componentButton" class="component-btn shape-rect" type="button">Enviar</button>
+        </div>
+
+        <div>
+          <strong>Eventos:</strong>
+          <div id="eventLog" class="log">[init] Componente listo.</div>
+        </div>
+
+        <div id="status"><span class="status-ok">Estado: Visible y habilitado</span></div>
+      </section>
+    </main>
+
+    <script>
+      const ui = {
+        text: document.getElementById('text'),
+        shape: document.getElementById('shape'),
+        width: document.getElementById('width'),
+        height: document.getElementById('height'),
+        applyBtn: document.getElementById('applyBtn'),
+        toggleEnabled: document.getElementById('toggleEnabled'),
+        toggleVisible: document.getElementById('toggleVisible'),
+        button: document.getElementById('componentButton'),
+        log: document.getElementById('eventLog'),
+        status: document.getElementById('status')
+      };
+
+      const component = {
+        id: 'btnEnviar',
+        text: 'Enviar',
+        shape: 'rect',
+        width: 160,
+        height: 50,
+        enabled: true,
+        visible: true,
+
+        onClick() {
+          writeLog(`[click] Se ejecutó la acción del botón ${this.id}.`);
+        },
+        onMouseEnter() {
+          writeLog('[mouseenter] Cursor sobre el botón.');
+        },
+        onMouseLeave() {
+          writeLog('[mouseleave] Cursor fuera del botón.');
+        }
+      };
+
+      function writeLog(msg) {
+        const now = new Date().toLocaleTimeString();
+        ui.log.textContent += `\n${now} ${msg}`;
+        ui.log.scrollTop = ui.log.scrollHeight;
+      }
+
+      function render() {
+        ui.button.textContent = component.text;
+        ui.button.style.width = `${component.width}px`;
+        ui.button.style.height = `${component.height}px`;
+
+        ui.button.classList.remove('shape-ellipse', 'shape-rect', 'shape-hex', 'disabled', 'hidden');
+        ui.button.classList.add(`shape-${component.shape}`);
+
+        if (!component.enabled) ui.button.classList.add('disabled');
+        if (!component.visible) ui.button.classList.add('hidden');
+
+        const stateText = `Estado: ${component.visible ? 'Visible' : 'Oculto'} y ${component.enabled ? 'habilitado' : 'deshabilitado'}`;
+        const stateClass = (component.visible && component.enabled) ? 'status-ok' : 'status-bad';
+        ui.status.innerHTML = `<span class="${stateClass}">${stateText}</span>`;
+      }
+
+      ui.applyBtn.addEventListener('click', () => {
+        component.text = ui.text.value.trim() || 'Botón';
+        component.shape = ui.shape.value;
+        component.width = Math.max(40, Number(ui.width.value) || 160);
+        component.height = Math.max(30, Number(ui.height.value) || 50);
+        render();
+        writeLog(`[update] Propiedades aplicadas: forma=${component.shape}, tamaño=${component.width}x${component.height}.`);
+      });
+
+      ui.toggleEnabled.addEventListener('click', () => {
+        component.enabled = !component.enabled;
+        render();
+        writeLog(`[state] Botón ${component.enabled ? 'habilitado' : 'deshabilitado'}.`);
+      });
+
+      ui.toggleVisible.addEventListener('click', () => {
+        component.visible = !component.visible;
+        render();
+        writeLog(`[state] Botón ${component.visible ? 'visible' : 'oculto'}.`);
+      });
+
+      ui.button.addEventListener('click', () => {
+        if (!component.visible || !component.enabled) {
+          writeLog('[click] No permitido por estado del componente.');
+          return;
+        }
+        component.onClick();
+      });
+
+      ui.button.addEventListener('mouseenter', () => component.onMouseEnter());
+      ui.button.addEventListener('mouseleave', () => component.onMouseLeave());
+
+      render();
+    </script>
+  </body>
+</html>
